@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Inbox</title>
+    <style>
+        /* Basic styling for the inbox and modal */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding-top: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .search-compose {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #emails .email {
+            background-color: #fff;
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+        }
+
+        #compose-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #compose-modal form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #compose-modal input,
+        #compose-modal textarea {
+            margin: 5px 0;
+            padding: 10px;
+            width: 100%;
+        }
+
+        #compose-modal button {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Email Inbox</h1>
+        <div class="search-compose">
+            <input type="text" id="search" placeholder="Search emails...">
+            <button onclick="searchEmails()">Search</button>
+            <button onclick="composeEmail()">Compose</button>
+        </div>
+        <div id="emails"></div>
+        <div id="compose-modal" style="display: none;">
+            <h2>Compose Email</h2>
+            <form id="compose-form" onsubmit="sendEmail(event)">
+                <label for="subject">Subject</label>
+                <input type="text" id="subject" name="subject" required><br>
+                <label for="body">Body</label>
+                <textarea id="body" name="body" required></textarea><br>
+                <button type="submit">Send</button>
+                <button type="button" onclick="closeComposeModal()">Close</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // URL of your backend (adjust accordingly)
+        const API_URL = "http://localhost:8080/emails";
+
+        // Sample emails for demo purposes
+        const sampleEmails = [
+            { subject: "Meeting Tomorrow", body: "Don't forget about our meeting tomorrow at 10am.", sender: "john@example.com" },
+            { subject: "Project Update", body: "The project is progressing well. Let me know if you need any updates.", sender: "sarah@example.com" },
+            { subject: "New Features Released", body: "We have launched new features in the app. Check them out!", sender: "admin@example.com" }
+        ];
+
+        // Display sample emails when the page loads
+        document.addEventListener("DOMContentLoaded", function() {
+            displayEmails(sampleEmails);
+        });
+
+        // Search emails based on user input
+        function searchEmails() {
+            const searchQuery = document.getElementById("search").value.toLowerCase();
+            const filteredEmails = sampleEmails.filter(email => 
+                email.subject.toLowerCase().includes(searchQuery) || 
+                email.body.toLowerCase().includes(searchQuery) ||
+                email.sender.toLowerCase().includes(searchQuery)
+            );
+            displayEmails(filteredEmails);
+        }
+
+        // Display emails in the inbox
+        function displayEmails(emails) {
+            const emailsContainer = document.getElementById("emails");
+            emailsContainer.innerHTML = "";  // Clear previous results
+
+            if (emails.length === 0) {
+                emailsContainer.innerHTML = "<p>No emails found.</p>";
+                return;
+            }
+
+            emails.forEach(email => {
+                const emailDiv = document.createElement("div");
+                emailDiv.className = "email";
+                emailDiv.innerHTML = `
+                    <h3>${email.subject}</h3>
+                    <p>${email.body}</p>
+                    <p><strong>From:</strong> ${email.sender}</p>
+                `;
+                emailsContainer.appendChild(emailDiv);
+            });
+        }
+
+        // Show the compose email modal
+        function composeEmail() {
+            const modal = document.getElementById("compose-modal");
+            modal.style.display = "block";  // Show compose modal
+        }
+
+        // Close the compose modal
+        function closeComposeModal() {
+            const modal = document.getElementById("compose-modal");
+            modal.style.display = "none";  // Hide compose modal
+        }
+
+        // Handle the email form submission
+        function sendEmail(event) {
+            event.preventDefault();  // Prevent the default form submission
+
+            const subject = document.getElementById("subject").value;
+            const body = document.getElementById("body").value;
+
+            const emailData = {
+                subject: subject,
+                body: body,
+                sender: "tushar@example.com"  // You can set the sender as needed
+            };
+
+            // For demonstration, we are just adding the new email to the list
+            sampleEmails.push(emailData);
+
+            alert("Email sent successfully!");
+            closeComposeModal();  // Close the modal after sending
+            displayEmails(sampleEmails);  // Refresh the inbox to reflect the sent email
+        }
+    </script>
+</body>
+
+</html>
